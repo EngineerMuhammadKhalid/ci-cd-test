@@ -1,13 +1,30 @@
-name: Static Site CI
+name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
+  pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: HTML Check
-        run: echo "Build successful"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run E2E tests
+        run: |
+          npx serve . -l 3000 &
+          npx playwright test
